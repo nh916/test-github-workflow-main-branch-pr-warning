@@ -3,7 +3,7 @@ name: PR Target Branch Check
 on:
   pull_request_target:
     branches:
-      - main  # Triggers the workflow when a PR is made to 'main'
+      - main
 
 permissions:
   pull-requests: write
@@ -18,7 +18,11 @@ jobs:
         if: github.event.pull_request.base.ref == 'main' && github.event.pull_request.head.ref != 'dev'
         with:
           script: |
-            const message = `🚨 Warning: This PR is targeting 'main' from '${{ github.event.pull_request.head.ref }}'. PRs should generally target 'dev'. Please check that you are merging to the correct branch. 🚨`;
+            const mainBranchUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/tree/main`;
+            const devBranchUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/tree/dev`;
+            const headBranch = `${{ github.event.pull_request.head.ref }}`;
+            const headBranchUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/tree/${headBranch}`;
+            const message = `🚨 Warning: This PR is targeting \`main\` from [\`${headBranch}\`](${headBranchUrl}). PRs should generally target [\`dev\`](${devBranchUrl}). Please check that you are merging to the correct branch. 🚨`;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
