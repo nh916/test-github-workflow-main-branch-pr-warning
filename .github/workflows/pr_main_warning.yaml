@@ -18,7 +18,7 @@ jobs:
         if: github.event.pull_request.base.ref == 'main' && github.event.pull_request.head.ref != 'dev'
         with:
           script: |
-            const message = `🚨 Warning: This PR is targeting `main` from '${{ github.event.pull_request.head.ref }}'. PRs should generally target `dev`. Please check that you are merging to the correct branch. 🚨`;
+            const message = `🚨 Warning: This PR is targeting 'main' from '${{ github.event.pull_request.head.ref }}'. PRs should generally target 'dev'. Please check that you are merging to the correct branch. 🚨`;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
