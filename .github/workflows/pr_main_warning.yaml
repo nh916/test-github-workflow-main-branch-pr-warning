@@ -1,0 +1,23 @@
+name: PR Target Branch Check
+
+on:
+  pull_request_target:
+    branches:
+      - main  # Triggers the workflow when a PR is made to 'main'
+
+jobs:
+  check-target:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR base and head branch
+        uses: actions/github-script@v5
+        if: github.event.pull_request.base.ref == 'main' && github.event.pull_request.head.ref != 'dev'
+        with:
+          script: |
+            const message = `🚨 Warning: This PR is targeting 'main' from '${{ github.event.pull_request.head.ref }}'. PRs should generally target 'dev'. Please check that you are merging to the correct branch. 🚨`;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: message
+            });
