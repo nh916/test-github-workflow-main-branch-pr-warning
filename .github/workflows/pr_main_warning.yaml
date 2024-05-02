@@ -22,7 +22,7 @@ jobs:
             const devBranchUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/tree/dev`;
             const headBranch = `${{ github.event.pull_request.head.ref }}`;
             const headBranchUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/tree/${headBranch}`;
-            const message = `🚨 Warning: This PR is targeting \`main\` from [\`${headBranch}\`](${headBranchUrl}). PRs should generally target [\`dev\`](${devBranchUrl}). Please check that you are merging to the correct branch. 🚨`;
+            const message = `🚨 Warning: This PR is targeting the\`main\` branch from [\`${headBranch}\`](${headBranchUrl}). PRs should generally target [\`dev\`](${devBranchUrl}). Please check that you are merging to the correct branch. 🚨`;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
