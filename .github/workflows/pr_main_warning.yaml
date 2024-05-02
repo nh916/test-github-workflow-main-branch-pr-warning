@@ -5,6 +5,10 @@ on:
     branches:
       - main  # Triggers the workflow when a PR is made to 'main'
 
+permissions:
+  pull-requests: write
+  issues: write
+
 jobs:
   check-target:
     runs-on: ubuntu-latest
