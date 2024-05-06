@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check PR base and head branch
-        uses: actions/github-script@v5
+        uses: actions/github-script@v7
         if: github.event.pull_request.base.ref == 'main' && github.event.pull_request.head.ref != 'dev'
         with:
           script: |
