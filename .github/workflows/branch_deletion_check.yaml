@@ -1,0 +1,35 @@
+name: Enforce Branch Protection
+
+on: 
+  push:
+    branches:
+      - main
+
+jobs:
+  enforce-branch-protection:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enforce branch protection rules
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const branches = ['main', 'dev'];
+            for (const branch of branches) {
+              const { data: protection } = await github.repos.getBranchProtection({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                branch: branch
+              });
+
+              await github.repos.updateBranchProtection({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                branch: branch,
+                required_status_checks: protection.required_status_checks,
+                enforce_admins: protection.enforce_admins.enabled,
+                required_pull_request_reviews: protection.required_pull_request_reviews,
+                restrictions: protection.restrictions,
+                allow_force_pushes: protection.allow_force_pushes,
+                allow_deletions: false  // Prevent deletion
+              });
+            }
