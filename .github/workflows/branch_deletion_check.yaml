@@ -1,0 +1,16 @@
+name: Prevent Branch Deletion
+
+on:
+  delete:
+    branches:
+      - main
+      - dev
+
+jobs:
+  prevent-deletion:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prevent deletion
+        run: |
+          echo "::error::You are not allowed to delete protected branches!"
+          exit 1
