@@ -1,0 +1,78 @@
+name: Deploy API to AWS
+
+on:
+  push:
+    tags:
+      - 'v*.*.*+prod'
+      - 'v*.*.*-dev'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to (dev or prod)'
+        required: true
+        type: choice
+        options:
+          - dev
+          - prod
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install poetry
+        poetry install
+
+    - name: Determine Deployment
+      id: deployment
+      run: |
+        if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+          echo "::set-output name=environment::${{ github.event.inputs.environment }}"
+        else
+          if [[ "${{ github.ref }}" == *-dev ]]; then
+            echo "::set-output name=environment::dev"
+          else
+            echo "::set-output name=environment::prod"
+          fi
+        fi
+
+    - name: Find Previous Tag
+      id: prev_tag
+      run: |
+        CURRENT_TAG=${GITHUB_REF#refs/tags/}
+        if [[ "${CURRENT_TAG}" == *-dev ]]; then
+          TAG_FILTER='*-dev'
+        else
+          TAG_FILTER='*+prod'
+        fi
+        PREVIOUS_TAG=$(git tag --sort=-v:refname | grep "${TAG_FILTER}" | grep -v "${CURRENT_TAG}" | head -n 1)
+        echo "PREVIOUS_TAG=${PREVIOUS_TAG}" >> $GITHUB_ENV
+
+    - name: Generate Release Notes
+      uses: github-changelog-generator/github-changelog-generator-action@v2
+      with:
+        tag-name: ${{ github.ref_name }}
+        previous-tag-name: ${{ env.PREVIOUS_TAG }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Deploy
+      run: |
+        if [ "${{ steps.deployment.outputs.environment }}" == "dev" ]; then
+          echo "Deploying to dev server"
+          # Add deployment commands for dev
+        else
+          echo "Deploying to prod server"
+          # Add deployment commands for prod
+        fi
