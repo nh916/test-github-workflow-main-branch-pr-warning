@@ -1,0 +1,6 @@
+[tool.poetry]
+name = "my project"
+version = "v1.0.0-dev"
+description = ""
+authors = []
+readme = "README.md"
