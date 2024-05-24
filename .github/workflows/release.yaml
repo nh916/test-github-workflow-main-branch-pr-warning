@@ -3,8 +3,8 @@ name: Deploy API to AWS
 on:
   push:
     tags:
-      - 'v*.*.*+prod'
-      - 'v*.*.*-dev'
+      - 'v[0-9]+.[0-9]+.[0-9]++prod'
+      - 'v[0-9]+.[0-9]+.[0-9]+-dev'
   workflow_dispatch:
     inputs:
       environment:
@@ -56,10 +56,15 @@ jobs:
         else
           TAG_FILTER='*+prod'
         fi
-        PREVIOUS_TAG=$(git tag --sort=-v:refname | grep "${TAG_FILTER}" | grep -v "${CURRENT_TAG}" | head -n 1)
+        PREVIOUS_TAG=$(git tag --sort=-v:refname | grep "${TAG_FILTER}" | grep -v "${CURRENT_TAG}" | head -n 1 || echo "none")
+        if [ "${PREVIOUS_TAG}" == "none" ]; then
+          echo "No previous tag found, using initial commit as baseline."
+          PREVIOUS_TAG=$(git rev-list --max-parents=0 HEAD)
+        fi
         echo "PREVIOUS_TAG=${PREVIOUS_TAG}" >> $GITHUB_ENV
 
     - name: Generate Release Notes
+      if: ${{ env.PREVIOUS_TAG != github.sha }}
       uses: github-changelog-generator/github-changelog-generator-action@v2
       with:
         tag-name: ${{ github.ref_name }}
