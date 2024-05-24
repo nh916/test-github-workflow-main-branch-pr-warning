@@ -3,8 +3,8 @@ name: Deploy API to AWS
 on:
   push:
     tags:
-      - 'v*+prod'
-      - 'v*-dev'
+      # - 'v*+prod'
+      # - 'v*-dev'
   workflow_dispatch:
     inputs:
       environment:
