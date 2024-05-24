@@ -63,8 +63,7 @@ jobs:
         echo "PREVIOUS_TAG=${PREVIOUS_TAG}" >> $GITHUB_ENV
 
     - name: Install GitHub Changelog Generator
-      run: |
-        $ gem install github_changelog_generator
+      run: github_changelog_generator -u nh916 -p test-github-workflow-main-branch-pr-warning 
 
     - name: Generate Release Notes
       run: |
