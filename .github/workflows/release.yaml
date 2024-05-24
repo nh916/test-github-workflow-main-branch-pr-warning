@@ -65,7 +65,9 @@ jobs:
 
     - name: Install GitHub Changelog Generator
       run: |
-        gem install github_changelog_generator
+        gem install --user-install github_changelog_generator
+        echo 'export PATH="$HOME/.gem/ruby/3.0.0/bin:$PATH"' >> $GITHUB_ENV
+        source $GITHUB_ENV
 
     - name: Generate Release Notes
       run: |
