@@ -3,8 +3,8 @@ name: Deploy API to AWS
 on:
   push:
     tags:
-      # - 'v*+prod'
-      # - 'v*-dev'
+      - 'v*prod'
+      - 'v*-dev'
   workflow_dispatch:
     inputs:
       environment:
@@ -63,14 +63,15 @@ jobs:
         fi
         echo "PREVIOUS_TAG=${PREVIOUS_TAG}" >> $GITHUB_ENV
 
+    - name: Install GitHub Changelog Generator
+      run: |
+        gem install github_changelog_generator
+
     - name: Generate Release Notes
-      if: ${{ env.PREVIOUS_TAG != github.sha }}
-      uses: github-changelog-generator/github-changelog-generator-action@v2
-      with:
-        tag-name: ${{ github.ref_name }}
-        previous-tag-name: ${{ env.PREVIOUS_TAG }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        PREVIOUS_TAG=${{ env.PREVIOUS_TAG }}
+        GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+        github_changelog_generator -t $GITHUB_TOKEN --since-tag $PREVIOUS_TAG --output CHANGELOG.md
 
     - name: Deploy
       run: |
