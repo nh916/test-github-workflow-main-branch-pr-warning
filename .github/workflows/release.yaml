@@ -38,12 +38,12 @@ jobs:
       id: deployment
       run: |
         if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-          echo "::set-output name=environment::${{ github.event.inputs.environment }}"
+          echo "environment=${{ github.event.inputs.environment }}" >> $GITHUB_ENV
         else
           if [[ "${{ github.ref }}" == *-dev ]]; then
-            echo "::set-output name=environment::dev"
-          else
-            echo "::set-output name=environment::prod"
+            echo "environment=dev" >> $GITHUB_ENV
+          elif [[ "${{ github.ref }}" == *+prod ]]; then
+            echo "environment=prod" >> $GITHUB_ENV
           fi
         fi
 
@@ -75,7 +75,7 @@ jobs:
 
     - name: Deploy
       run: |
-        if [ "${{ steps.deployment.outputs.environment }}" == "dev" ]; then
+        if [ "${{ env.environment }}" == "dev" ]; then
           echo "Deploying to dev server"
           # Add deployment commands for dev
         else
